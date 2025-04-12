@@ -11,11 +11,17 @@ class CorsMiddleware
 
     public function handle($request, Closure $next)
     {
-        $response = $next($request);
-        $frontendUrl = env('APP_FRONTEND_URL');
+        if ($request->getMethod() === 'OPTIONS') {
+            return response()->json([], 200)
+                ->header('Access-Control-Allow-Origin', env('APP_FRONTEND_URL'))
+                ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+                ->header('Access-Control-Allow-Headers', 'Origin, Content-Type, Accept, Authorization, X-Requested-With')
+                ->header('Access-Control-Allow-Credentials', 'true');
+        }
 
+        $response = $next($request);
+        $response->headers->set('Access-Control-Allow-Origin', env('APP_FRONTEND_URL'));
         $response->headers->set('Access-Control-Allow-Credentials', 'true');
-        $response->headers->set('Access-Control-Allow-Origin', $frontendUrl);
         $response->headers->set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
         $response->headers->set('Access-Control-Allow-Headers', 'Origin, Content-Type, Accept, Authorization, X-Requested-With');
 
