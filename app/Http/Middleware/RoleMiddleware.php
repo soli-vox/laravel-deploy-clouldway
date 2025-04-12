@@ -11,6 +11,11 @@ class RoleMiddleware
 {
     public function handle(Request $request, Closure $next, $role)
     {
+
+        if ($request->isMethod('OPTIONS')) {
+            return $next($request);
+        }
+
         if (!Auth::check()) {
             Log::info(
                 "RoleMiddleware: Unauthenticated",
@@ -33,6 +38,8 @@ class RoleMiddleware
                 'message' => 'Forbidden: Insufficient role permissions'
             ], 403);
         }
+
+
 
         return $next($request);
     }
