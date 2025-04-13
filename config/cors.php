@@ -15,19 +15,10 @@ return [
     |
     */
 
-    'paths' => [
-        'api/*',
-        'login',
-        'logout',
-        'roles',
-        'bank-types',
-        'sanctum/csrf-cookie'
-    ],
+    'paths' => ['*'],
     'allowed_methods' => ['*'],
-    'allowed_origins' => [
-        'https://pvms-test-frontend.netlify.app'
-    ],
-    'allowed_origins_patterns' => [],
+    'allowed_origins' => [env('FRONTEND_URL', 'http://localhost:5173')],
+    'allowed_origins_patterns' => ['*'],
     'allowed_headers' => ['*'],
     'exposed_headers' => [],
     'max_age' => 0,
