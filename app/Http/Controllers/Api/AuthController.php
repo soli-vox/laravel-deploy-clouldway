@@ -83,10 +83,7 @@ class AuthController extends ApiController
 
     public function resetPassword(Request $request)
     {
-        $key = 'reset-password:' . $request->ip();
-        if (RateLimiter::tooManyAttempts($key, 5)) {
-            return $this->errorResponse('Too many attempts. Please try again later.', 429);
-        }
+
         try {
             $request->validate([
                 'email' => 'required|email|exists:users,email',
@@ -138,11 +135,9 @@ class AuthController extends ApiController
                 'user_id' => $user->id,
                 'email' => $user->email,
             ]);
-            RateLimiter::clear($key);
             $this->notificationService->sendPasswordResetSuccessNotification($user);
             return $this->successResponse('Password updated successfully');
         } catch (\Exception $e) {
-            RateLimiter::hit($key, 60);
             Log::error('Password reset failed', [
                 'email' => $request->email,
                 'error' => $e->getMessage(),
