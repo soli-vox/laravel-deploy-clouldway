@@ -20,7 +20,12 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role' => RoleMiddleware::class,
         ]);
-        $middleware->append(CorsMiddleware::class);
+        $middleware->prepend(CorsMiddleware::class);
+        $middleware->api([
+            SetCacheHeaders::class,
+            'throttle:api',
+            SubstituteBindings::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
