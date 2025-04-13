@@ -15,7 +15,14 @@ return [
     |
     */
 
-    'paths' => ['api/*'],
+    'paths' => [
+        'api/*',
+        'login',
+        'logout',
+        'roles',
+        'bank-types',
+        'sanctum/csrf-cookie'
+    ],
     'allowed_methods' => ['*'],
     'allowed_origins' => [
         'https://pvms-test-frontend.netlify.app'
