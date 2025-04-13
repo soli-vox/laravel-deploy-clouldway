@@ -12,9 +12,13 @@ class RoleMiddleware
     public function handle(Request $request, Closure $next, $role)
     {
 
-        if ($request->isMethod('OPTIONS')) {
-            return $next($request);
-        }
+        $response = $next($request);
+
+        $response->headers->set('Access-Control-Allow-Origin', '*');
+        $response->headers->set('Access-Control-Allow-Methods', 'POST, GET, OPTIONS, PUT, DELETE');
+        $response->headers->set('Access-Control-Allow-Headers', 'Content-Type, X-Auth-Token, Origin, Authorization');
+
+
 
         if (!Auth::check()) {
             Log::info(
@@ -38,8 +42,6 @@ class RoleMiddleware
                 'message' => 'Forbidden: Insufficient role permissions'
             ], 403);
         }
-
-
 
         return $next($request);
     }
