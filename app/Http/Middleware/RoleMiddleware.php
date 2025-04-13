@@ -11,39 +11,50 @@ class RoleMiddleware
 {
     public function handle(Request $request, Closure $next, $role)
     {
-
-        $response = $next($request);
-
-        $response->headers->set('Access-Control-Allow-Origin', 'https://pvms-test-frontend.netlify.app');
-        $response->headers->set('Access-Control-Allow-Methods', 'POST, GET, OPTIONS, PUT, DELETE');
-        $response->headers->set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
-        $response->headers->set('Access-Control-Expose-Headers', 'Authorization');
-
-
-
+        // 1. Check Authentication FIRST
         if (!Auth::check()) {
             Log::info(
                 "RoleMiddleware: Unauthenticated",
-                ['user' => Auth::user(), 'token' => $request->bearerToken()]
+                ['url' => $request->fullUrl(), 'token_present' => $request->bearerToken() ? 'Yes' : 'No']
             );
             return response()->json([
-                'message' => 'Unauthenticated'
+                'message' => 'Unauthenticated.'
             ], 401);
         }
 
         $user = Auth::user();
-        Log::info("RoleMiddleware: Checking role", [
-            'user_id' => $user->id,
-            'role_id' => $user->role_id,
-            'role_slug' => $user->role ? $user->role->slug : 'null',
-            'expected_role' => $role,
-        ]);
-        if ($user->role->slug !== $role) {
+
+        // Optional: Check if role relationship exists before accessing slug
+        if (!$user->role) {
+            Log::error("RoleMiddleware: User has no role assigned.", [
+                'user_id' => $user->id,
+            ]);
             return response()->json([
-                'message' => 'Forbidden: Insufficient role permissions'
+                'message' => 'Forbidden: User role not configured.'
             ], 403);
         }
 
+        Log::info("RoleMiddleware: Checking role", [
+            'user_id' => $user->id,
+            'user_role_id' => $user->role_id,
+            'user_role_slug' => $user->role->slug,
+            'expected_role' => $role,
+        ]);
+
+        // 2. Check Role
+        if ($user->role->slug !== $role) {
+            Log::warning("RoleMiddleware: Role mismatch.", [
+                'user_id' => $user->id,
+                'user_role_slug' => $user->role->slug,
+                'expected_role' => $role,
+            ]);
+            return response()->json([
+                'message' => 'Forbidden: Insufficient role permissions.'
+            ], 403);
+        }
+
+        // 3. If all checks pass, proceed with the request
+        // Call $next() only ONCE here
         return $next($request);
     }
 }
