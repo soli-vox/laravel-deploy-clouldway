@@ -16,7 +16,7 @@ return [
     */
 
     'paths' => ['api/*'],
-    'allowed_methods' => ['POST, GET, OPTIONS, PUT, DELETE'],
+    'allowed_methods' => ['*'],
     'allowed_origins' => [
         'https://pvms-test-frontend.netlify.app'
     ],
