@@ -16,7 +16,7 @@ return [
     */
 
     'paths' => ['api/*'],
-    'allowed_methods' => ['*'],
+    'allowed_methods' => ['POST, GET, OPTIONS, PUT, DELETE'],
     'allowed_origins' => [
         'https://pvms-test-frontend.netlify.app'
     ],
@@ -24,6 +24,6 @@ return [
     'allowed_headers' => ['*'],
     'exposed_headers' => [],
     'max_age' => 0,
-    'supports_credentials' => false,
+    'supports_credentials' => true,
 
 ];
